@@ -11,7 +11,7 @@ from gitshoes import __version__
 @click.version_option()
 @click.option('-u', '--user', help='GitHub username or organisation name.', required=True)
 @click.option('-r', '--repository', help='GitHub repository name.', required=True)
-@click.option('-t', '--token', help='GitHub oAuth token.', required=True)
+@click.option('-t', '--token', help='GitHub OAuth token.', required=True)
 @click.option('-f', '--filename', default='issues.csv', help='Output (CSV) filename.')
 
 # Main application loop
