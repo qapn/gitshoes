@@ -30,21 +30,24 @@ def run(user, repository, token, filename):
 
     with open(filename, 'w') as write_report:
         writer = csv.writer(write_report)
-        writer.writerow(['Number', 'Created At', 'Updated At', 'Title', 'Description', 'Labels'])
+        writer.writerow(['Number', 'Created At', 'Updated At', 'Title', 'Description', 'Labels', 'Assignees'])
         for issue in issues:
-            writer.writerow([issue.number, issue.created_at, issue.updated_at, issue.title, issue.body, get_labels(issue.labels)])
+            writer.writerow([issue.number, issue.created_at, issue.updated_at, issue.title, issue.body, get_nested_items(issue.labels, 'labels'), get_nested_items(issue.assignees, 'assignees')])
     write_report.close()
 
     print(str(issues.totalCount) + ' issues written to ' + filename)
 
-# Return a concatenated labels string, takes a label list from an issue as input
-def get_labels(labels):
-    labels_string = ""
-    for x, label in enumerate(labels, 1):
-        labels_string += label.name
-        if x != len(labels):
-            labels_string += ", "
-    return labels_string
+# Return a concatenated string from nested items, takes a list of either labels or assignees from an issue as input
+def get_nested_items(nested_items, type):
+    concat_string = ''
+    for x, item in enumerate(nested_items, 1):
+        if type == 'labels':
+            concat_string += item.name
+        elif type == 'assignees':
+            concat_string += item.login
+        if x != len(nested_items):
+            concat_string += ', '
+    return concat_string
 
 # Entrypoint for running the main loop
 if __name__ == '__main__':
