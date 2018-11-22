@@ -47,3 +47,6 @@ MANIFEST
 
 # Per-project virtualenvs
 .venv*/
+
+# CSV files, so stuff generated during dev for testing doesn't get committed
+*.csv

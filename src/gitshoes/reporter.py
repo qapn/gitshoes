@@ -1,5 +1,6 @@
 import click
 import logging
+import csv
 from github import Github
 
 from gitshoes import __version__
@@ -13,18 +14,25 @@ from gitshoes import __version__
 
 # Main application loop
 def run(user, repo, token, filename):
-    print('user: %s' % user)
-    print('repo: %s' % repo)
-    print('token: %s' % token)
-    print('filename: %s' % filename)
-
     github = Github(token)
     repo = github.get_repo(user + "/" + repo)
-    repo.get_issues(state='open')
     issues = repo.get_issues(state='open')
 
-    print(issues[10])
+    with open(filename, 'w') as write_report:
+        writer = csv.writer(write_report)
+        writer.writerow(['Number', 'Created At', 'Updated At', 'Title', 'Description', 'Labels'])
+        for issue in issues:
+            writer.writerow([issue.number, issue.created_at, issue.updated_at, issue.title, issue.body, get_labels(issue.labels)])
+    write_report.close()
 
+# Return a concatenated labels string, takes a label list from an issue as input
+def get_labels(labels):
+    labels_string = ""
+    for x, label in enumerate(labels, 1):
+        labels_string += label.name
+        if x != len(labels):
+            labels_string += ", "
+    return labels_string
 
 # Entrypoint for running the main loop
 if __name__ == '__main__':
