@@ -8,15 +8,17 @@ from gitshoes import __version__
 @click.command(context_settings=dict(help_option_names=['-h', '--help']))
 @click.version_option()
 @click.option('-u', '--user', help='GitHub username or organisation name.', required=True)
-@click.option('-r', '--repo', help='GitHub repository name.', required=True)
+@click.option('-r', '--repository', help='GitHub repository name.', required=True)
 @click.option('-t', '--token', help='GitHub oAuth token.', required=True)
 @click.option('-f', '--filename', default='issues.csv', help='Output (CSV) filename.')
 
 # Main application loop
-def run(user, repo, token, filename):
+def run(user, repository, token, filename):
     github = Github(token)
-    repo = github.get_repo(user + "/" + repo)
+    repo = github.get_repo(user + '/' + repository)
     issues = repo.get_issues(state='open')
+
+    print('Retrieving ' + str(issues.totalCount) + ' issues from ' + user + '/' + repository + '...')
 
     with open(filename, 'w') as write_report:
         writer = csv.writer(write_report)
@@ -24,6 +26,8 @@ def run(user, repo, token, filename):
         for issue in issues:
             writer.writerow([issue.number, issue.created_at, issue.updated_at, issue.title, issue.body, get_labels(issue.labels)])
     write_report.close()
+
+    print(str(issues.totalCount) + ' issues written to ' + filename)
 
 # Return a concatenated labels string, takes a label list from an issue as input
 def get_labels(labels):
