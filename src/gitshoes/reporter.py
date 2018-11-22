@@ -1,7 +1,9 @@
 import click
 import logging
 import csv
+import sys
 from github import Github
+from github import GithubException
 
 from gitshoes import __version__
 
@@ -15,7 +17,13 @@ from gitshoes import __version__
 # Main application loop
 def run(user, repository, token, filename):
     github = Github(token)
-    repo = github.get_repo(user + '/' + repository)
+    try:
+        repo = github.get_repo(user + '/' + repository)
+    except GithubException as e:
+        repo = None
+        print("GitHub returned the following error: '" + e.data.get('message') + "'. Check your username/repository/token and try again.")
+        sys.exit(1)
+
     issues = repo.get_issues(state='open')
 
     print('Retrieving ' + str(issues.totalCount) + ' issues from ' + user + '/' + repository + '...')
